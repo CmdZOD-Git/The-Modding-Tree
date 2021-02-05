@@ -4,7 +4,7 @@ var gameEnded = false;
 
 // Don't change this
 const TMT_VERSION = {
-	tmtNum: "2.3.3.1",
+	tmtNum: "2.3.5",
 	tmtName: "Cooler and Newer Edition"
 }
 
@@ -51,7 +51,7 @@ function getNextAt(layer, canMax=false, useType = null) {
 	if (type=="static") 
 	{
 		if (!tmp[layer].canBuyMax) canMax = false
-		let amt = player[layer].points.plus((canMax&&tmp[layer].baseAmount.gte(tmp[layer].nextAt))?tmp[layer].resetGain:0)
+		let amt = asD(player[layer].points).plus((canMax&&tmp[layer].baseAmount.gte(tmp[layer].nextAt))?tmp[layer].resetGain:0)
 		let extraCost = Decimal.pow(tmp[layer].base, amt.pow(tmp[layer].exponent).div(tmp[layer].gainExp)).times(tmp[layer].gainMult)
 		let cost = extraCost.times(tmp[layer].requires).max(tmp[layer].requires)
 		if (tmp[layer].roundUpCost) cost = cost.ceil()
@@ -87,6 +87,20 @@ function shouldNotify(layer){
 	if (player[layer].activeChallenge && canCompleteChallenge(layer, player[layer].activeChallenge)) {
 		return true
 	}
+
+	if (isPlainObject(tmp[layer].tabFormat)) {
+		for (subtab in tmp[layer].tabFormat){
+			if (subtabShouldNotify(layer, 'mainTabs', subtab))
+				return true
+		}
+	}
+
+	for (family in tmp[layer].microtabs) {
+		for (subtab in tmp[layer].microtabs[family]){
+			if (subtabShouldNotify(layer, family, subtab))
+				return true
+		}
+	}
 	if (tmp[layer].shouldNotify){
 		return tmp[layer].shouldNotify
 	}
@@ -101,7 +115,7 @@ function canReset(layer)
 	else if(tmp[layer].type == "normal")
 		return tmp[layer].baseAmount.gte(tmp[layer].requires)
 	else if(tmp[layer].type== "static")
-		return tmp[layer].baseAmount.gte(tmp[layer].nextAt) 
+		return asD(tmp[layer].baseAmount).gte(tmp[layer].nextAt) 
 	else 
 		return false
 }
@@ -125,15 +139,19 @@ function layerDataReset(layer, keep = []) {
 		if (player[layer][keep[thing]] !== undefined)
 			storedData[keep[thing]] = player[layer][keep[thing]]
 	}
+	Vue.set(player[layer], "buyables", getStartBuyables(layer))
+	Vue.set(player[layer], "clickables", getStartClickables(layer))
+	Vue.set(player[layer], "challenges", getStartChallenges(layer))
 
 	layOver(player[layer], getStartLayerData(layer))
 	player[layer].upgrades = []
 	player[layer].milestones = []
+	player[layer].achievements = []
 	player[layer].challenges = getStartChallenges(layer)
 	resetBuyables(layer)
+
 	if (layers[layer].clickables && !player[layer].clickables) 
 		player[layer].clickables = getStartClickables(layer)
-
 	for (thing in storedData) {
 		player[layer][thing] =storedData[thing]
 	}
@@ -206,6 +224,8 @@ function doReset(layer, force=false) {
 	for (let x = row; x >= 0; x--) rowReset(x, layer)
 	rowReset("side", layer)
 	prevOnReset = undefined
+
+	player[layer].resetTime = 0
 
 	updateTemp()
 	updateTemp()
@@ -310,11 +330,12 @@ function gameLoop(diff) {
 			diff = limit
 	}
 	addTime(diff)
-	player.points = player.points.add(tmp.pointGen.times(diff)).max(0)
+	player.points = asD(player.points).add(tmp.pointGen.times(diff)).max(0)
 
 	for (x = 0; x <= maxRow; x++){
 		for (item in TREE_LAYERS[x]) {
 			let layer = TREE_LAYERS[x][item]
+			player[layer].resetTime += diff
 			if (tmp[layer].passiveGeneration) generatePoints(layer, diff*tmp[layer].passiveGeneration);
 			if (layers[layer].update) layers[layer].update(diff);
 		}
@@ -323,6 +344,7 @@ function gameLoop(diff) {
 	for (row in OTHER_LAYERS){
 		for (item in OTHER_LAYERS[row]) {
 			let layer = OTHER_LAYERS[row][item]
+			player[layer].resetTime += diff
 			if (tmp[layer].passiveGeneration) generatePoints(layer, diff*tmp[layer].passiveGeneration);
 			if (layers[layer].update) layers[layer].update(diff);
 		}
@@ -372,11 +394,18 @@ var interval = setInterval(function() {
 	if (player.offTime !== undefined) {
 		if (player.offTime.remain > modInfo.offlineLimit * 3600) player.offTime.remain = modInfo.offlineLimit * 3600
 		if (player.offTime.remain > 0) {
+			extraTime = player.offTime.remain
+			player.offTime = undefined
+			// CMDZOD : MAKING BIG CHANGE TO STORE OFFLINE TIME AND USE IT THROUGH SIDE NODE
+			/*
 			let offlineDiff = Math.max(player.offTime.remain / 10, diff)
 			player.offTime.remain -= offlineDiff
 			diff += offlineDiff
+			*/
 		}
-		if (!player.offlineProd || player.offTime.remain <= 0) player.offTime = undefined
+
+		// if (!player.offlineProd || player.offTime.remain <= 0) player.offTime = undefined
+			
 	}
 	if (player.devSpeed) diff *= player.devSpeed
 	player.time = now

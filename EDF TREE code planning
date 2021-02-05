@@ -1,0 +1,243 @@
+#2 - Populating the game
+##GAMEPLAY IDEA 
+* start with ant swarm one stack with a lot of very weak ant
+* Make weapon more active against actor and with specific feature
+	- Rifle : good target number and damage per bullet
+	- Shotgun : better hit number but less value per hit
+	- Rocket : Direct hit for big value + extra value if there is a big number
+* pump up Threat more as a way to stop progress
+* Only make threat over 100% affect progress speed : divided by 100/threat to cap % over 100%
+* This should give more of a rollercoaster feeing to Progression, as you kill baddies, you threat value disminishes and you can progress easier
+
+
+##CORE RULE : Start small and build step by step
+
+[OK] The first 3 missions
+* Story mission (3 steps)
+* unlock random easy (1 Star) mission (3 steps w/ small increase)
+* unlock random medium (2 Stars) misison (5 steps) w/ small increase
+
+[OK] BIG WORK : NEED TO CLEAN EVENT PROCEDURE !!! > Done through actor now, use Addevent and Event checker
+
+[OK] the first 3 baddies
+* Black Ant Swarm
+* Anthill
+* Spiders
+
+[OK] STILL NEED MORE WORK TO SETUP EVENTS
+* Added Side filter, added tag filter
+* no meta, no event queue for now that's way past my level
+
+[OK] the first 3 weapons
+* M-X16 (fire strafe event)
+* 2x Shotgun (fire shotgun event)
+* Rocket Launcher (fire blast event)
+
+[OK] CHANGE TO PLAN
+* [OK] Need to improve the weapon event logic and make weapon more active against actor as a core feature
+* [FUTURE CONTENT ] Could had extra %based event as extra for weapon
+	- This means changing the equip logic to something more robust and inline with Actor handling
+	- Need to form a damage function targeting an actor[index] to handle weapon easily
+* [OK] Make ant swarm spawn logic tries to add to an existing stack before making one
+
+* [OK] Need eventStorage Object to have extra value for self-reference like a cooldown (check return false until cooldown is passed) and an active time (for buff/debuff)
+* [OK] Could use the eventStorage to Store and pass args when function is called, like time of last call (pseudo cooldown or last state of something)
+	- The eventManager is called by update storing diff > could use it and pass it to function
+	- Because of the datastructure used this is too hard for this project, i would need a specific parameter to list what i need and update it on call to pass it to the function
+	- Timestamp is a good idea but anything past that need to be handled with a larger scope (ie, i could score a kill count in the actor list to check upon but not a specific event kill count) [OK and no problem for storing value]
+	- Note to self : diff is second based, time is millisecond based
+* Could also prototype helper tag since we can filer by tag now [NEED A CASE FIRST]
+* [OK] Change baddies spawning to something closer to real gameplay
+* [OK] Need to rewrite hero Equip logic to something cleaner
+	- set equipment in hero
+	- equiped list is checked before mission start and passed to missionEventLoadout (you can change hero equip, it won't change the setup took in mission)
+	- look by the addActor to add it to Hero at every step change [OK]
+
+* [OK] Could make hero permanent through step now and have building up events working way better
+	- [OK] need to implement a keep / discard logic for actor and events on StepNext
+	- [TODO] Would need a nextStepBehaviour "reset" to clear counter from an event
+	- [OK] ProgressBase, threat and threat cap are now updatable and buffable by event because they are now actoer (and event) based
+		- [OK] Threat Cap
+		- [OK] Progress genimplementation]
+		- [OK] Threat gen
+		- [OK] Writing a generic getGenericValue with wrapper
+	- [OK - bu this can create stalling] Creating an armor flat / armor % property for actor (mainly baddies)
+	- [OK - will do a PoC event - Need to have a smarter logic on generic core value to avoid inflation (calculate event and actor value separatly)] Apply general update to HP for regen / max HP buff on update
+	- [TODO - So enemy do damage or timer based ?] Allies spawning (w/ event genereator)
+	- [TODO - LOW PRIORITY] Format into a table the actor list
+	- [TODO] We could start talking about Meta actor
+	- [TODO] Start sorting the layers.js to have relevent functions close to each other
+	- [TODO] How to do equipment upgrades or mods ?
+	- [WIP - Offline time is unpluged now, need to make a time control side node] plug diff and offlinetime differently so that you can store it and use it through NODE button
+
+* [OK !!!] Serious talk : i need to change the data structure on value
+	- rename it to life because it's more grokable
+	- split in 4 :
+		* life.base (like a real core value)
+		* life.mult (like a real core value)
+		* life.remain (that's valueCurrent right now or lifeCurrent with new name)
+		* life.value (that's the basic working value)
+	- i need all this to make it work with buff and have a 
+	[NOTE TO SELF : in future project, break you core value into name.base / .mult / . remain / .core]
+		* On update, i'll check if lifeValue has changed and pass the difference to lifeRemain
+			- i'll do it +/-flat but you could argue to keep the same ratio between remain and value
+		* I just need to change every function working with value in my game for that to work !
+		* need to do it for each value that where i need to track max / current (could do the same for threat / threatCap and progress/progressTarget)
+
+[OK] the first 3 gears
+* Medikit (extra Threat recovery)
+* Armor (extra Threat Cap)
+* Grenade (trigger blast event)
+
+the first 3 class Abilities
+* Fast advance (low threat boost progress)
+* Resist (High Threat boost threat recovery)
+* Building success (each succesful step increase stats)
+
+the first 3 events
+* [TODO] Spider net
+* [OK] Anthill ant spawn
+* [OK] Blast  (Grenade / rocket launcher) > Would rather work on weapon modifier (like extra target per X target quantity)
+
+the next 3 events
+* Multi-shot (chance to have extra progress, extra event) [IDEA : Could recursivly call event from event]
+* Strafe
+* Recover
+
+The first 3 HQ upgrades
+* Collect rec points
+* XP Generator
+* Spawn allies (tied to HQ level)
+
+The next 3 HQ upgrase
+* Auto-start random mission (toggle on mission to AUTO)
+* ???
+* ???
+
+Gonna need a few more stuff
+* Events need to have a source to pass to effect [OK]
+* Clean-up all lore / and layers to be playable
+
+
+#1 - Core loop
+
+	Complete mission
+	* Get Rewards
+		- XP for player levels
+		- Victory Points for HQ
+		- Requisition Points for upgrades (various layers)
+
+	* Unlock new things
+		- Harder mission
+		- New layer (foreshadowed by milestones)
+		- New equipments
+OK easy to do, simple prestige stuff
+
+#HQ Layer
+	Points : Levels
+	base resource : Victory points
+
+	gameplay value :
+	* Central hub
+		- hold milestones (new stuff come frome here)
+	* upgrade to spend Req points on
+OK easy to do, simple prestige stuff
+
+	#Hero Layer
+	points : levels
+	base resource : XP
+	gameplay value :
+	* Decision making
+		- select class & sub-class
+		- select weapons & gears
+		- select abilties that are carried into mission
+OK easy to do, needs to plan extra data
+- player class
+- player sub-class
+- Equipment slot (for weapon)
+- Equipment behaviour (smart switch evaluation **Oh GOD**, use both)
+- Equip points
+
+**Q:Multi-Weapon and events don't play well together (how do you manage the event pool if you can switch on the fly ?)**
+
+#Mission Layer
+	points : VP
+	base resource : step
+	extra resource : progress
+
+	gameplay value :
+	* Main source of progression
+		- complete steps and missions to acquire VP
+		- holds the mission mini-game where you can express you're choice from the Hero Layer
+OK can be done
+
+##Mission mini-game
+
+	###Layer 1 : your progress vs progess target
+	* to complete mission you must complete X steps
+	* to comple a step you must acquire X progress point
+	* Progress points come from actor (read hero and allies) weapons and gear (mainly)
+OK means :
+you define progress target
+you call for progess every (diff) and add all base progress the add to progress
+	You populate a layer with every progress effect to add(layer & id)
+	**That's the hard part**
+you then check vs target
+
+	###Layer 2 : the Actor mini-game
+	* Steps list Actor on the scene
+	* Each actor can have an effect on base progress
+	* Each actor has a number, a list of equipment, a name and possibly TAGS to react to
+
+	_example :
+	GOOD ACTOR
+	- 1 Hero [LEVEL get hero level],[HERO]
+	- 2 Medium Tanks [LEVEL 25],[VEHICLE, HEAVY]
+	- 15 Allied soldiers [LEVEL 10],[INFANTRY]
+	- 3 HQ support [LEVEL 10],[TURRET]
+
+	NEUTRAL ACTOR
+	- 25 Civilians
+	- 10 Buildings
+	- 2 Props (need to be more precise)
+	- 10 Things to recover (need to be more precise)
+
+	BAD ACTOR
+	- 120 ANTS [LEVEL 10],[BUGS, ANTS]
+	- 50 SPIDER [LEVEL 10],[BUGS, SPIDER]
+	- 30 FLIES [LEVEL 10],[BUGS, FLYING, WASP]
+	- 5 GIANT ROBOT [LEVEL 30],[GIANT, ROBOT]
+	- 1 BOSS [LEVEL 45],[BOSS, GIANT, ETHER]
+OK so you need a layer of all actors
+for each actor you call the progress request
+this feed the main getProgressPoint function()
+
+Right now we have
+
+getProgressPoints()
+	Get actors
+	By actors call effect they have
+	return total value
+
+###Layer 3 : the event mini-game
+	* Every few seconds there is an event Array
+	* Lot of things can put into the event Array
+	* Events can react to other event firing (one chance per event)
+
+it will be mission layer based & events layer based 
+* Need an eventCheck array of object and an eventQueue array of object
+* On step setup, the events array is built, you can had here events to check, level and side
+* this put an object array in the array with eventName, levels and side
+* We can check through path (unfortunately the data structure is a mess, i'll do it differently next time) and ask object to give us their event (one only for now)
+* When an event fires, it's checked by other event (that can put things into the queue...)
+* I would like my event effect function to be reusable so there is a event layer called with all the event inside
+
+###Layer 4 : the THREAT mini-game
+	* THREAT is a gauge going between current THREAT and THREAT CAP
+	* Each second there is a calculation between THREAT generated by BAD actors and THREAT removed by good ACTORS
+	* THREAT is basically a muliplier tied to a sliding scale
+	* if you spend too much time over THREAT CAP mission is reset (so there is a FAIL CASE), think of it as a grind wall to have a THREAT CAP and THREAT RECOVERY good enough to push through missions
+* Need a ThreatPoints, a ThreatPointsCap variables
+* Need a function threatPointGen calling all ACTORS and PSEUDO ACTORS (call META ACTORS before but same idea)
+* calculate ratio and apply scaling to get Threat Multiplier
+* Need a ThreatOver variable to know if there is stalling and return mission lost boolean

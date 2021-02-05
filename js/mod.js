@@ -1,8 +1,8 @@
 let modInfo = {
-	name: "The Earth Defence ModTree",
-	id: "EDFmod",
-	author: "CmdZOD",
-	pointsName: "victory points",
+	name: "The EDF Tree",
+	id: "EDF Tree",
+	author: "ZOD",
+	pointsName: "Rec. points",
 	discordName: "",
 	discordLink: "",
 	initialStartPoints: new Decimal (10), // Used for hard resets and new players
@@ -13,18 +13,40 @@ let modInfo = {
 // Set your version in num and name
 let VERSION = {
 	num: "0.1",
-	name: "First step",
+	name: "Doing Mission",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.1</h3><br>
-		- Let's start a mod.<br>`
+		- HQ, Hero and mission layer`
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
 
 // If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
 // (The ones here are examples, all official functions are already taken care of)
-var doNotCallTheseFunctionsEveryTick = ["blowUpEverything"]
+var doNotCallTheseFunctionsEveryTick = [
+										"pickFromIndexList",
+										"getActorIndexListBySubArray",
+										"getActorIndexListByFilter",
+										"chancePercent",
+										"otherSide",
+										"getRandomInt",
+										"debugActorList",
+										"canProgressPointGen",
+										"getProgressPointGen",
+										"endMission",
+										"stepNext",
+										"canGenThreat",
+										"getThreatPointGen",
+										"setThreatCap",
+										"populateActor",
+										"addActor",
+										"addEvent",
+										"altPopulateEventWatchList",
+										"eventManager",
+										"eventCheck",
+										"eventEffect",
+										]
 
 function getStartPoints(){
     return new Decimal(modInfo.initialStartPoints)
@@ -32,7 +54,7 @@ function getStartPoints(){
 
 // Determines if it should show points/sec
 function canGenPoints(){
-	return true
+	return false
 }
 
 // Calculate points/sec!
@@ -46,18 +68,17 @@ function getPointGen() {
 
 // You can add non-layer related variables that should to into "player" and be saved here, along with default values
 function addedPlayerData() { return {
+	extraTime : 0
 }}
+
 
 // Display extra things at the top of the page
 var displayThings = [
-	"Battle Report",
-	"you have 1 soldier with 1 Firepower",
-	"Your troop are killing 1 ant per second"
 ]
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("e280000000"))
+	return asD(player.points).gte(new Decimal("e280000000"))
 }
 
 
