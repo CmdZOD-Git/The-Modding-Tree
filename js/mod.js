@@ -1,24 +1,34 @@
 let modInfo = {
 	name: "The EDF Tree",
 	id: "EDF Tree",
-	author: "ZOD",
+	author: "CmdZOD",
 	pointsName: "Rec. points",
 	discordName: "",
 	discordLink: "",
 	initialStartPoints: new Decimal (10), // Used for hard resets and new players
 	
-	offlineLimit: 1,  // In hours
+	offlineLimit: 12,  // In hours
 }
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.1",
-	name: "Doing Mission",
+	num: "0.5",
+	name: "Public release",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
+	<h3>v0.5</h3><br>
+		- first public release
+	<h3>v0.4</h3><br>
+		- threat is now static instead of per second
+
+	<h3>v0.3</h3><br>
+		- heavy prototyping to add all the features needed by the mission layer
+
 	<h3>v0.1</h3><br>
-		- HQ, Hero and mission layer`
+		- HQ, Hero and mission layer
+
+`
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
 
@@ -68,12 +78,19 @@ function getPointGen() {
 
 // You can add non-layer related variables that should to into "player" and be saved here, along with default values
 function addedPlayerData() { return {
-	extraTime : 0
+	extraTime : 0,
+	extraSpeed : 1,
+
+// Global variables
+	globalEventManagerLastCallTime : 0, // need to be global to be checked by shoutbox
+	globalShoutbox : [], // expected use, add object w/ "name, createTime, extra info " ie, {name : "dead", createTime : TIME, amount : new Decimal(56)}
 }}
 
 
 // Display extra things at the top of the page
 var displayThings = [
+	()=>{return `Extra time stored : ${player.extraTime.toFixed(0)} second(s)`},
+	()=>{return `Current Speed : x${player.extraSpeed.toFixed(0)}` },
 ]
 
 // Determines when the game "ends"

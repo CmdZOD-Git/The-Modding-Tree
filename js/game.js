@@ -394,7 +394,7 @@ var interval = setInterval(function() {
 	if (player.offTime !== undefined) {
 		if (player.offTime.remain > modInfo.offlineLimit * 3600) player.offTime.remain = modInfo.offlineLimit * 3600
 		if (player.offTime.remain > 0) {
-			extraTime = player.offTime.remain
+			player.extraTime += player.offTime.remain
 			player.offTime = undefined
 			// CMDZOD : MAKING BIG CHANGE TO STORE OFFLINE TIME AND USE IT THROUGH SIDE NODE
 			/*

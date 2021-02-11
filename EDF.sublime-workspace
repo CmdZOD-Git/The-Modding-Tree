@@ -4,6 +4,162 @@
 		"selected_items":
 		[
 			[
+				"Fi",
+				"FiveObject"
+			],
+			[
+				"spe",
+				"specificActor"
+			],
+			[
+				"mul",
+				"multValue"
+			],
+			[
+				"bas",
+				"baseValue"
+			],
+			[
+				"extr",
+				"extraTime"
+			],
+			[
+				"targe",
+				"target"
+			],
+			[
+				"q",
+				"quantity"
+			],
+			[
+				"kill",
+				"killCount"
+			],
+			[
+				"dam",
+				"damageCountToReturn"
+			],
+			[
+				"dama",
+				"damageCount"
+			],
+			[
+				"val",
+				"value"
+			],
+			[
+				"tRe",
+				"tResultArray"
+			],
+			[
+				"tres",
+				"tResultArray"
+			],
+			[
+				"add",
+				"addToTags"
+			],
+			[
+				"mo",
+				"modToAdd"
+			],
+			[
+				"shot",
+				"shotParameter"
+			],
+			[
+				"sh",
+				"shotParameter"
+			],
+			[
+				"call",
+				"callingMod"
+			],
+			[
+				"sho",
+				"shotParameter"
+			],
+			[
+				"tS",
+				"tShotParameter"
+			],
+			[
+				"ts",
+				"tShotParameter"
+			],
+			[
+				"eve",
+				"eventEffect"
+			],
+			[
+				"ev",
+				"eventCheck"
+			],
+			[
+				"ca",
+				"callingEvent"
+			],
+			[
+				"event",
+				"eventStorage"
+			],
+			[
+				"tE",
+				"tEventList"
+			],
+			[
+				"inde",
+				"indexOf"
+			],
+			[
+				"glob",
+				"globalShoutbox"
+			],
+			[
+				"gl",
+				"globalEventManagerLastCallTime"
+			],
+			[
+				"glo",
+				"globalShoutbox"
+			],
+			[
+				"n",
+				"now"
+			],
+			[
+				"eventMa",
+				"eventManagerLastCallTime"
+			],
+			[
+				"ex",
+				"extraParameters"
+			],
+			[
+				"su",
+				"summonExtraEvents"
+			],
+			[
+				"ext",
+				"summonExtraParameters"
+			],
+			[
+				"t",
+				"tSummon"
+			],
+			[
+				"ac",
+				"actorLib"
+			],
+			[
+				"tP",
+				"tPower"
+			],
+			[
+				"summ",
+				"summonName"
+			],
+			[
 				"in",
 				"inMission"
 			],
@@ -22,10 +178,6 @@
 			[
 				"va",
 				"value"
-			],
-			[
-				"val",
-				"valueCurrent"
 			],
 			[
 				"value",
@@ -64,24 +216,12 @@
 				"getEquippedEventTitle"
 			],
 			[
-				"shot",
-				"shotDamage"
-			],
-			[
 				"wea",
 				"weapon"
 			],
 			[
-				"sho",
-				"shotDamage"
-			],
-			[
 				"threat",
 				"threat"
-			],
-			[
-				"call",
-				"callingEvent"
 			],
 			[
 				"last",
@@ -116,10 +256,6 @@
 				"getProgressThreatMultiplier"
 			],
 			[
-				"ev",
-				"eventStorage"
-			],
-			[
 				"vl",
 				"valueCurrent"
 			],
@@ -140,20 +276,8 @@
 				"targetObject"
 			],
 			[
-				"dama",
-				"damageDone"
-			],
-			[
-				"dam",
-				"damageForumla"
-			],
-			[
 				"da",
 				"damageForumla"
-			],
-			[
-				"kill",
-				"killFormula"
 			],
 			[
 				"damage",
@@ -166,10 +290,6 @@
 			[
 				"shotT",
 				"shotToKillFromCurrent"
-			],
-			[
-				"sh",
-				"shotToKill"
 			],
 			[
 				"hp",
@@ -204,14 +324,6 @@
 				"extraParameters"
 			],
 			[
-				"eve",
-				"eventStorage"
-			],
-			[
-				"event",
-				"eventStorage"
-			],
-			[
 				"pick",
 				"pickTable"
 			],
@@ -234,10 +346,6 @@
 			[
 				"getAc",
 				"getActorIndexListByFilter"
-			],
-			[
-				"inde",
-				"indexList"
 			],
 			[
 				"starting",
@@ -288,20 +396,12 @@
 				"actorList"
 			],
 			[
-				"add",
-				"addAEvent"
-			],
-			[
 				"eventL",
 				"eventLib"
 			],
 			[
 				"ant",
 				"antswarmspan"
-			],
-			[
-				"spe",
-				"spiderswarm"
 			],
 			[
 				"step",
@@ -317,14 +417,6 @@
 			],
 			[
 				"extra",
-				"extraParameters"
-			],
-			[
-				"ac",
-				"actorToAdd"
-			],
-			[
-				"ex",
 				"extraParameters"
 			],
 			[
@@ -422,108 +514,34 @@
 			[
 				"ste",
 				"nextStepBehaviour"
-			],
-			[
-				"acto",
-				"actorList"
-			],
-			[
-				"trea",
-				"threatBase"
-			],
-			[
-				"mission",
-				"missionParameters"
-			],
-			[
-				"ne",
-				"nextStepBehaviour"
-			],
-			[
-				"h",
-				"hero"
-			],
-			[
-				"aco",
-				"actor"
-			],
-			[
-				"time",
-				"times"
-			],
-			[
-				"def",
-				"defineProgTarget"
-			],
-			[
-				"pla",
-				"player"
-			],
-			[
-				"pro",
-				"progress"
-			],
-			[
-				"dis",
-				"display"
-			],
-			[
-				"pl",
-				"player"
-			],
-			[
-				"planned",
-				"plannedParam"
-			],
-			[
-				"hq",
-				"hqPlanned"
-			],
-			[
-				"Obj",
-				"Object"
-			],
-			[
-				"plann",
-				"plannedMission"
-			],
-			[
-				"con",
-				"console"
-			],
-			[
-				"st",
-				"style"
-			],
-			[
-				"ret",
-				"returnString"
-			],
-			[
-				"retur",
-				"returnString"
-			],
-			[
-				"missi",
-				"mission"
-			],
-			[
-				"slot",
-				"weaponSlotAvailable"
-			],
-			[
-				"cost",
-				"costThing"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
+			"file": "js/mission.js",
+			"settings":
+			{
+				"buffer_size": 9252,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"file": "EDF TREE code planning",
 			"settings":
 			{
-				"buffer_size": 10694,
+				"buffer_size": 13686,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/hero.js",
+			"settings":
+			{
+				"buffer_size": 22935,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -532,7 +550,17 @@
 			"file": "js/data.js",
 			"settings":
 			{
-				"buffer_size": 9250,
+				"buffer_size": 16260,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "js/layers.js",
+			"settings":
+			{
+				"buffer_size": 16902,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		}
@@ -570,20 +598,24 @@
 	"expanded_folders":
 	[
 		"/home/maniden/Documents/The-Modding-Tree-master",
+		"/home/maniden/Documents/The-Modding-Tree-master/docs",
 		"/home/maniden/Documents/The-Modding-Tree-master/js"
 	],
 	"file_history":
 	[
-		"/home/maniden/Documents/The-Modding-Tree-master/js/layers.js",
-		"/home/maniden/Documents/The-Modding-Tree-master/js/Debug Console Cheat Sheet.js",
-		"/home/maniden/Documents/The-Modding-Tree-master/js/hero.js",
-		"/home/maniden/Documents/The-Modding-Tree-master/js/mission.js",
-		"/home/maniden/Documents/The-Modding-Tree-master/js/hq.js",
-		"/home/maniden/Documents/The-Modding-Tree-master/js/data.js",
+		"/home/maniden/Documents/The-Modding-Tree-master/js/tree.js",
 		"/home/maniden/Documents/The-Modding-Tree-master/EDF TREE code planning",
-		"/home/maniden/Documents/The-Modding-Tree-master/js/game.js",
 		"/home/maniden/Documents/The-Modding-Tree-master/js/mod.js",
+		"/home/maniden/Documents/The-Modding-Tree-master/js/game.js",
+		"/home/maniden/Documents/The-Modding-Tree-master/docs/upgrades.md",
+		"/home/maniden/Documents/The-Modding-Tree-master/js/hero.js",
+		"/home/maniden/Documents/The-Modding-Tree-master/js/layers.js",
+		"/home/maniden/Documents/The-Modding-Tree-master/js/mission.js",
 		"/home/maniden/Documents/The-Modding-Tree-master/index.html",
+		"/home/maniden/Documents/The-Modding-Tree-master/js/data.js",
+		"/home/maniden/Documents/The-Modding-Tree-master/js/technical/temp.js",
+		"/home/maniden/Documents/The-Modding-Tree-master/js/Debug Console Cheat Sheet.js",
+		"/home/maniden/Documents/The-Modding-Tree-master/js/hq.js",
 		"/home/maniden/Documents/The-Modding-Tree-master/js/utils.js",
 		"/home/maniden/Documents/The-Modding-Tree-master/js/technical/layerSupport.js",
 		"/home/maniden/Documents/The-Modding-Tree-master/js/technical/break_eternity.js",
@@ -593,11 +625,9 @@
 		"/home/maniden/Documents/The-Modding-Tree-master/js/event.js",
 		"/home/maniden/Documents/The-Modding-Tree-master/js/actorlib.js",
 		"/home/maniden/Documents/The-Modding-Tree-master/EDF TREE Design Doc",
-		"/home/maniden/Documents/The-Modding-Tree-master/js/tree.js",
 		"/home/maniden/Documents/The-Modding-Tree-master/js/Demo/demoLayers.js",
 		"/home/maniden/Documents/The-Modding-Tree-master/Obsolete/code planning",
 		"/home/maniden/Documents/The-Modding-Tree-master/Obsolete/EDF TREE Design Doc",
-		"/home/maniden/Documents/The-Modding-Tree-master/docs/upgrades.md",
 		"/home/maniden/Documents/The-Modding-Tree-master/docs/layer-features.md",
 		"/home/maniden/Documents/The-Modding-Tree-master/docs/milestones.md",
 		"/home/maniden/Documents/The-Modding-Tree-master/js/technical/systemComponents.js",
@@ -624,13 +654,15 @@
 	],
 	"find":
 	{
-		"height": 40.0
+		"height": 39.0
 	},
 	"find_in_files":
 	{
 		"height": 118.0,
 		"where_history":
 		[
+			"<open files>",
+			"/home/maniden/Documents/The-Modding-Tree-master/docs",
 			"/home/maniden/Documents/The-Modding-Tree-master/js",
 			"/home/maniden/Documents/The-Modding-Tree-master",
 			"/home/maniden/Documents/The-Modding-Tree-master/js/Demo",
@@ -651,9 +683,54 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": true,
+		"case_sensitive": false,
 		"find_history":
 		[
+			"WIP",
+			"threatCap",
+			"getThreatRatio",
+			"progress",
+			"getTh",
+			"getThreat",
+			"threat",
+			"Threat",
+			"getThreat",
+			"stepNex",
+			"threat",
+			"obj",
+			"threat",
+			"diff",
+			"weapon",
+			"Mod",
+			"mod",
+			"eventCh",
+			"eventC",
+			"getEventLoadout",
+			"Loadou",
+			"hasUpgrade",
+			"deepC",
+			"show",
+			"addAc",
+			"addActor",
+			"otherS",
+			"addA",
+			"addAc",
+			"addac",
+			".id",
+			"id",
+			"forcenewactor",
+			"callingEvent.tag",
+			"hqturret",
+			"addAc",
+			"tags",
+			"actorLib.",
+			"addActor",
+			"addEvent",
+			"eventCooldown",
+			"lifeup",
+			"lifeUp",
+			"valueUp",
+			"addAc",
 			"addac",
 			"valueUp",
 			"remain",
@@ -736,52 +813,7 @@
 			"updateEquipedevent",
 			"threat",
 			"getProgressPointGen",
-			"eventMa",
-			"altPopulateEventWatchList",
-			"populate",
-			"addActor",
-			"load()",
-			"save()",
-			"load",
-			"shotDamage",
-			"shotCount",
-			"getProgressThreatMultiplier",
-			"progres",
-			"eventStorage",
-			"antswarmsp",
-			"doD",
-			"currentValue",
-			"killSerie",
-			"equals",
-			"eq",
-			"equal",
-			".gt",
-			"gt(",
-			"gt",
-			"damageForumla",
-			"targethp",
-			"target",
-			"cmp",
-			"compare",
-			"new Decimal(",
-			"shotToKillFromCurrent",
-			"trunc",
-			"floor",
-			"pop",
-			"populateActor",
-			"event",
-			"total",
-			"gear",
-			"addact",
-			"baseClone",
-			"cloneDe",
-			"cloneDeep",
-			"addActor()",
-			"addac",
-			".*Decimal",
-			"Decimal",
-			"decimal",
-			"caller"
+			"eventMa"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -789,6 +821,12 @@
 		"regex": false,
 		"replace_history":
 		[
+			"this",
+			"tDiff",
+			"",
+			"cooldown",
+			"lifeup",
+			"lifeUp",
 			"nobase",
 			"tShotDamage",
 			"neutralMult",
@@ -844,53 +882,24 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "EDF TREE code planning",
+					"file": "js/mission.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 10694,
+						"buffer_size": 9252,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4154,
-								4154
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Markdown/Markdown.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1288.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "js/data.js",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 9250,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2026,
-								2026
+								0,
+								0
 							]
 						],
 						"settings":
@@ -900,10 +909,129 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 342.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "EDF TREE code planning",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 13686,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1144,
+								1144
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "js/hero.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 22935,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3940,
+								3940
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2340.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "js/data.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16260,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4061,
+								4061
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1581.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "js/layers.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 16902,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4591,
+								4591
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3996.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
 					"type": "text"
 				}
 			]
@@ -911,7 +1039,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 28.0
+		"height": 26.0
 	},
 	"input":
 	{
@@ -948,7 +1076,7 @@
 	"project": "",
 	"replace":
 	{
-		"height": 72.0
+		"height": 70.0
 	},
 	"save_all_on_build": true,
 	"select_file":

@@ -1,3 +1,76 @@
+#3 - Cleaning-up before moving forward
+##Catcing TODO and WIP
+
+* Format actor table
+	- need a little set of pre-formed string
+	- [LATER] could experiment w/ fillable clickables
+		* could do target list
+		* could do full info panel
+
+* Meta Actor
+	- Find a good use case
+
+* Helper function for targetting could be useful
+	- Hard filter
+	- Preference sorting
+
+* Need a addMod function targeting an event
+
+* I could also prototype a shoutbox
+	- Find a good use case
+
+* Need to relink threat ratio to progress
+
+* Clarify what is a local mult and a global mult
+
+* Cleanup pseudo FiveObject into proper Five Object
+
+##Adding missing content
+Class Abilities
+* Fast advance (no enemy boost progress)
+* Resist (High Threat allow to progress w/ slower speed through X% of overthreat)
+* Building success (each succesful step increase stats (progress and threatCap))
+* Re-act (%chance to act twice)
+
+Events
+* Spider net (slow down progress by a mult or a flat)
+* Re-use left shot
+
+HQ upgrades
+* Collect rec points
+* XP Generator
+* Spawn allies (tied to HQ level)
+* Auto-start random mission (toggle on mission to AUTO)
+
+##Roadmap
+TODO when upper ## are done
+* Mission Design
+	- When going into a battle the mission should give pointer to what Rank is allowed, elite frequency, threat budget, progress per step and number of steps
+
+* Battle recruiter design
+	- enemies are recruited based on a threat budget
+	- roll for group number (between 3 and 9 for exemple)
+	- all group but the last one are selected w/ random roll and rank limit
+	(you roll for boss, elite, normal troop) then a group is picked according to rank
+	- each group take a portion of the budget
+	- budget tries to fill a quantity for the allocated budget part
+	- remaining budget is recalculated after each step
+	- filler is always picked last and is always normal (because they have lower threat value and this avoid overbudgetting hard)
+	
+
+* Progres game design
+	- progress is designed to work with 100 progress target
+	- each step the batte recruiter is called
+	- we could add random events at X time or X progress (buff / debuff)
+	- mission has lore only description of what's going on in this step
+	- step up could be increase to threat budget or straight rank up of enemy
+		* simple design for now, step up is x1.1 the last step threat budget and every 5 step there is an auto rank up
+	- i'll design for rank 1 to 3 to start (enemoes will be hand designed for each rank)
+	- elite are usually a rank higher in difficulty
+	- boss can be 2 rank higher ability wise
+	- i should plan for up to rank 9 to start
+
+
 #2 - Populating the game
 ##GAMEPLAY IDEA 
 * start with ant swarm one stack with a lot of very weak ant
@@ -46,7 +119,9 @@
 	- Because of the datastructure used this is too hard for this project, i would need a specific parameter to list what i need and update it on call to pass it to the function
 	- Timestamp is a good idea but anything past that need to be handled with a larger scope (ie, i could score a kill count in the actor list to check upon but not a specific event kill count) [OK and no problem for storing value]
 	- Note to self : diff is second based, time is millisecond based
-* Could also prototype helper tag since we can filer by tag now [NEED A CASE FIRST]
+* [FUTURE CONTENT] Could also prototype helper tag since we can filer by tag now [NEED A CASE FIRST]
+	- like a targetter weapon and allies priorities the same target
+	- Prettt high concept
 * [OK] Change baddies spawning to something closer to real gameplay
 * [OK] Need to rewrite hero Equip logic to something cleaner
 	- set equipment in hero
@@ -55,7 +130,7 @@
 
 * [OK] Could make hero permanent through step now and have building up events working way better
 	- [OK] need to implement a keep / discard logic for actor and events on StepNext
-	- [TODO] Would need a nextStepBehaviour "reset" to clear counter from an event
+	- [OK] Would need a nextStepBehaviour "reset" to clear counter from an event
 	- [OK] ProgressBase, threat and threat cap are now updatable and buffable by event because they are now actoer (and event) based
 		- [OK] Threat Cap
 		- [OK] Progress genimplementation]
@@ -63,12 +138,43 @@
 		- [OK] Writing a generic getGenericValue with wrapper
 	- [OK - bu this can create stalling] Creating an armor flat / armor % property for actor (mainly baddies)
 	- [OK - will do a PoC event - Need to have a smarter logic on generic core value to avoid inflation (calculate event and actor value separatly)] Apply general update to HP for regen / max HP buff on update
-	- [TODO - So enemy do damage or timer based ?] Allies spawning (w/ event genereator)
+	- [OK - Action based] Allies spawning (w/ event genereator)
+		* Timer based or shot based for now
 	- [TODO - LOW PRIORITY] Format into a table the actor list
 	- [TODO] We could start talking about Meta actor
-	- [TODO] Start sorting the layers.js to have relevent functions close to each other
-	- [TODO] How to do equipment upgrades or mods ?
-	- [WIP - Offline time is unpluged now, need to make a time control side node] plug diff and offlinetime differently so that you can store it and use it through NODE button
+		* [TODO] Some helper function for targetting could be useful
+	- [OK] Start sorting the layers.js to have relevent functions close to each other
+		* [OK] same for data
+	- [OK - works through mod and events] How to do equipment upgrades or mods ?
+	- [OK] Offline time is unpluged now, need to make a time control side node
+	- [OK] Improve return object from doDamage to return shot left
+
+* [OK] Groundwork for weapon modificator
+	
+	- [OK] Proof of concept : class skill to had Crit to all rifle weapon
+
+	- I won't do a full event stack & shoutbox but that is definitly an idea for another project
+	- [OK] it's the job of the Loadout manager to add mod to the proper event
+	- [OK] i'll build the upgrades through mod object
+	- [OK] mod are mini event designed to modify an event
+	- [OK] event can have a modStorage
+	- [OK] the main target for mod is the weapon event
+	- [OK] a mod iterator will be called to modify events value
+		* Crit and multiple chained crit
+		* Change target number
+		* General damage multiplier
+	- [OK] iterator is called between event effect and doDamage
+	- [OK] need to be implemented per effect
+
+	- [TODO] Need a addMod function targeting an event
+	- [OK] Need a mod check logic for hero layer
+
+	- [WIP] I could also prototype a shoutbox
+		* [OK] will be handled by the event manager
+		* [OK - use a global in playerdata] manager store it's calling time
+		* all shoutbox item get the calling time of the event manager (so that's a global var ?)
+		* [OK] you're not allowed to look at anything past the event manager time
+		* [OK] after a full event manager purge anything before event manager time
 
 * [OK !!!] Serious talk : i need to change the data structure on value
 	- rename it to life because it's more grokable
@@ -84,15 +190,23 @@
 		* I just need to change every function working with value in my game for that to work !
 		* need to do it for each value that where i need to track max / current (could do the same for threat / threatCap and progress/progressTarget)
 
+* [NOT SO SURE ABOUT IT] change event manager from the 1 second logic to plug it to cooldown/diff logic
+
+* [OK] Threat is now a static value (split in 4), and so is threatCap (split in 4)
+	- Enemy are threat block
+	- threat vs threatCap ratio from 0 to 100% is you slowing down by this much 
+	- At 100% ThreatCap you can't progress
+	- [WIP] need to relink threat ratio to progress
+
 [OK] the first 3 gears
 * Medikit (extra Threat recovery)
 * Armor (extra Threat Cap)
 * Grenade (trigger blast event)
 
 the first 3 class Abilities
-* Fast advance (low threat boost progress)
-* Resist (High Threat boost threat recovery)
-* Building success (each succesful step increase stats)
+* Fast advance (no enemy boost progress)
+* Resist (High Threat allow to progress w/ 10% speed)
+* Building success (each succesful step increase stats (progress and threatCap))
 
 the first 3 events
 * [TODO] Spider net

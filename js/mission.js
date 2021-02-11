@@ -1,5 +1,5 @@
 function getThreatRatio() {
-    let tRatio = asD(player["mission"].threat).div(player["mission"].threatCap)
+    let tRatio = asD(player["mission"].threat.value).div(player["mission"].threatCap.value)
     tRatio = (tRatio.lt(1) == 1) ? new Decimal(1) : tRatio
     return tRatio
 }
@@ -35,8 +35,8 @@ addLayer("mission", {
         progress: new Decimal(0),
         progressTarget: new Decimal(100),
 
-        threat : new Decimal(0),
-        threatCap: new Decimal(0),
+        threat : new FiveObject(0),
+        threatCap: new FiveObject(0),
 
         eventWatchList : [],
         eventQueue : [],
@@ -102,7 +102,7 @@ addLayer("mission", {
                     // tList = tList + actor.name.toString() + "<br />";
                     tList = tList + `<h3 style="color:${colorPerSide(actor.side)}">${actor.name}</h3> Lv ${actor.level} [${actor.tags.toString().toUpperCase()}]<br />
                     Qt : ${actor.quantity} HP : ${actor.life.remain} (${formatWhole(asD(actor.life.remain).times(new Decimal(100)).div(actor.life.value))}%)<br />
-                    Threat : ${actor.threatBase} per unit, total ${formatWhole(getThreatPointGen(new Decimal(1), actor))} /sec<br /><br />
+                    Threat : ${getThreat(actor,["perunit"]).toString()} per unit, total ${formatWhole(getThreat(actor)).toString()}<br /><br />
                     `
                 }
                 return tList
@@ -123,7 +123,7 @@ addLayer("mission", {
             // **Optional**, Apply CSS to the unfilled portion, filled portion, border, and display text on the bar, in the form of an object where the keys are CSS attributes, and the values are the values for those attributes (both as strings).
             display() {
                 if (player["mission"].inMission == true) {
-                    return `${formatWhole(player["mission"].progress)} progress (${formatWhole(getProgressPointGen(new Decimal(1)).div(getThreatRatio()))}/sec) out of ${formatWhole(player["mission"].progressTarget)}`
+                    return `${formatWhole(player["mission"].progress)} progress (${formatWhole(getProgressPointGen(new Decimal(1)))}/sec) out of ${formatWhole(player["mission"].progressTarget)}`
                 }
             },
 
@@ -146,21 +146,27 @@ addLayer("mission", {
                         
             display() {
                 if (player["mission"].inMission == true) {
-                    if(asD(player["mission"].threat).gt(player["mission"].threatCap)==1){
+                    if(asD(player["mission"].threat.value).gt(player["mission"].threatCap.value)==1){
                         return `Overt Threat Cap by ${formatWhole(getThreatRatio().times(new Decimal(100)))} %`
                     } else {
-                        return `${formatWhole(player["mission"].threat)} threat (${formatWhole(getThreatPointGen(new Decimal(1)))}/s), cap at ${formatWhole(player["mission"].threatCap)}`}
+                        return `${formatWhole(player["mission"].threat.value)} threat, cap at ${formatWhole(player["mission"].threatCap.value)}`}
                     }
             },
 
             progress() {
                 if (player["mission"].inMission == true) {
-                    return asD(player["mission"].threat).div(player["mission"].threatCap)}
+                    return asD(player["mission"].threat.value).div(player["mission"].threatCap.value)}
             },
         },
     },
     
     update(diff){
+        let tDiff = diff
+        if (player.extraTime >0 && player.extraSpeed > 1) {
+            tDiff *= player.extraSpeed
+            player.extraTime -= tDiff
+            if (player.extraTime < 0) player.extraTime = 0
+        }
         //Forcing Lock / Unlock & Tooltip
         if (player["mission"].inMission) {
             player["mission"].unlocked = true;
@@ -177,18 +183,21 @@ addLayer("mission", {
                 stepNext();
         // Regular loop
         } else if (player["mission"].inMission == true){
-            player["mission"].progress = asD(player["mission"].progress).add(getProgressPointGen(diff).div(getThreatRatio()));            
-            player["mission"].threat =  asD(player["mission"].threat).add(getThreatPointGen(diff));
+            //TEMP // player["mission"].progress = asD(player["mission"].progress).add(getProgressPointGen(tDiff).div(getThreatRatio()));
+            player["mission"].progress = asD(player["mission"].progress).add(getProgressPointGen(tDiff));
+
+            player["mission"].threat.value =  getThreat();
+            player["mission"].threatCap.value =  getThreatCap();
             
-            player["mission"].eventTimeAccumulator = asD(player["mission"].eventTimeAccumulator).add(diff)
+            player["mission"].eventTimeAccumulator = asD(player["mission"].eventTimeAccumulator).add(tDiff)
             
-            // console.log(asD(player["mission"].eventTimeAccumulator).toString()+ " " + diff)
+            // console.log(asD(player["mission"].eventTimeAccumulator).toString()+ " " + tDiff)
 
             if(player["mission"].eventTimeAccumulator.gte(new Decimal(1)) == 1) {
             //      console.log("eventManager Called");
                   eventManager();
                   
-                    player["mission"].threatCap = getThreatCap();
+                    player["mission"].threatCap.value = getThreatCap();
                     player["mission"].actorList.forEach(e => {
                         let tLife = asD(e.life.value);
                         let tDiff = new Decimal(0)
@@ -213,7 +222,7 @@ addLayer("mission", {
 player["mission"].eventTimeAccumulator = asD(player["mission"].eventTimeAccumulator).sub(new Decimal(1));
             } ;
 
-            if(asD(player["mission"].threat).lt(0)) player["mission"].threat = new Decimal(0);
+            if(asD(player["mission"].threat.value).lt(0)) player["mission"].threat.value = new Decimal(0);
             
             // Next step call
             if(asD(player["mission"].progress).gte(player["mission"].progressTarget)) stepNext();

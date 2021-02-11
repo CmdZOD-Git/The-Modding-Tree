@@ -24,7 +24,7 @@ function getRandomInt(min, max) {
 // Can / Get core value functions
 //
 
-function getGenericCoreValue(value, path, diff, specificActor, flag) {
+function getGenericCoreValue(value, path, diff, specificActor, specificEvent, flag) {
     // Exemple call : getGenericCoreValue("progress" , player["mission"].actorList , diff , specificActor)
     // Exemple value fo tPath : player["mission"].actorList
     let tValue = value.toString();
@@ -57,6 +57,13 @@ function getGenericCoreValue(value, path, diff, specificActor, flag) {
             tActorList.push(specificActor)
         } else {
             tActorList = tPath
+        }
+
+        let tEventList = [];
+        if (specificEvent != null && specificEvent != undefined) {
+            tEventList.push(specificEvent)
+        } else {
+            tEventList = ["eventStorage"]
         }
 
         let neutralBase;
@@ -99,7 +106,6 @@ function getGenericCoreValue(value, path, diff, specificActor, flag) {
                                 fMult = (f[neutralMult] == null || f[neutralMult] == undefined) ? new Decimal(1) : f[neutralMult];
                             }
 
-                            
                             eBase = asD(eBase).add(fBase);
                             eMult = asD(eMult).mul(fMult);
                         }
@@ -144,12 +150,22 @@ function getThreatPointGen(diff, specificActor){
     return getGenericCoreValue( "threat", player["mission"].actorList, diff, specificActor)
 }
 
+function getThreat(specificActor, flag) {
+    if (flag != undefined && flag.includes("perunit") && (specificActor !=null || specificActor != undefined)) {
+        return getGenericCoreValue( "threat" , player["mission"].actorList , new Decimal(1) , specificActor , undefined , ["splitinfour", "quantityneutral"])
+    } else {
+        return getGenericCoreValue( "threat" , player["mission"].actorList , new Decimal(1) , specificActor , undefined , ["splitinfour"])
+    }
+
+    
+}
+
 function getThreatCap(specificActor) {
-    return getGenericCoreValue( "threatCap" , player["mission"].actorList , new Decimal(1) , specificActor)
+    return getGenericCoreValue( "threatCap" , player["mission"].actorList , new Decimal(1) , specificActor, undefined , ["splitinfour"])
 }
 
 function getLife(specificActor) {
-    return getGenericCoreValue( "life" , player["mission"].actorList , new Decimal(1) , specificActor, ["splitinfour","quantityneutral"])
+    return getGenericCoreValue( "life" , player["mission"].actorList , new Decimal(1) , specificActor, undefined, ["splitinfour","quantityneutral"])
 }
 
 /* NOT NEEDED ANYMORE
@@ -162,7 +178,22 @@ function getValueCurrent(specificActor) {
 // Mission handler / Control function
 //
 
+function getAvailableShoutBoxItem(){
+    let tResult=[];
+    globalShoutbox.forEach(
+        e => {
+            if(e.createTime < playerdata.globalEventManagerLastCallTime && (e.createTime != null && e.createTime != undefined)){
+                tResult.push(e)
+            }
+        }
+    )
+return tResult
+}
+
 function eventManager(){
+
+    player.globalEventManagerLastCallTime = Date.now(); // this is a global variable
+
     player["mission"].actorList.forEach(
         e => e.eventStorage.forEach (
             f => {if (eventLib[f.name].eventCheck.call(e,f,f.lastCall) == true) {
@@ -171,6 +202,15 @@ function eventManager(){
             }
         )
     )
+    if  (playerdata.globalShoutbox != null && playerdata.globalShoutbox != undefined) {
+        playerdata.globalShoutbox.forEach(
+            e => {
+                if(e.createTime < playerdata.globalEventManagerLastCallTime || (e.createTime == null && e.createTime == undefined)){
+                    playerdata.globalShoutbox.splice(globalShoutbox.indexOf(f => f === e),1)
+                }
+            }
+        )
+    }
 }
 
 function stepNext(){
@@ -192,15 +232,15 @@ function stepNext(){
     cleanupActor();
     populateActor();
 
-    player["mission"].threat = new Decimal(0);
-    player["mission"].threatCap = getThreatCap();
+    player["mission"].threat.value = getThreat();
+    player["mission"].threatCap.value = getThreatCap();
     }
 }
 
 function populateActor() {
     //see mission layer setup for info
     if(!(player["mission"].actorList.some(e => e.name == "Hero"))) {
-    addActor(actorLib.hero, {level : player["hero"].points , eventStorage : [...player["mission"].missionEventLoadout]});
+    addActor("hero", {level : player["hero"].points , eventStorage : [...player["mission"].missionEventLoadout]});
     }
 
     for (let i = 0; player["mission"].missionStepCurrent.gt(i); i++) {
@@ -210,15 +250,15 @@ function populateActor() {
 
         switch (rng) {
         case 1:
-        addActor(actorLib.antswarm, {quantity : new Decimal(getRandomInt(50,100))});
+        addActor("antswarm", {quantity : new Decimal(getRandomInt(50,100))});
         break;
 
         case 2:
-        addActor(actorLib.anthill);
+        addActor("anthill");
         break;
 
         case 3:
-        addActor(actorLib.spiderswarm, {quantity : new Decimal(getRandomInt(10,20))});
+        addActor("spiderswarm", {quantity : new Decimal(getRandomInt(10,20))});
         break;        
         }
     }
@@ -234,7 +274,11 @@ function cleanupActor() {
             } else {
                 e.eventStorage.forEach(
                     f => {
-                        if (e.nextStepBehaviour != "keep") {
+                        if (e.nextStepBehaviour == "keep") {
+                        }
+                        else if (e.nextStepBehaviour == "reset") {
+                            e.counter = new Decimal(0)
+                        } else {
                             tPath.splice(tPath.indexOf(f))
                         }
                     }   
@@ -254,8 +298,8 @@ function endMission(){
     player["mission"].progress = new Decimal(0);
     player["mission"].progressTarget = new Decimal(100);
     
-    player["mission"].threat = new Decimal(0);
-    player["mission"].threatCap = new Decimal(0);
+    player["mission"].threat.value = new Decimal(0);
+    player["mission"].threatCap.value = new Decimal(0);
     player["mission"].missionParameters = null;
 
     player["mission"].actorList = [];
@@ -269,20 +313,28 @@ function endMission(){
 // Actorlist handler
 //
 
-function addActor(actorToAdd, extraParameters){
-    // Note : proper extraParam syntax : addActor(actorLib.hero, {name : "bob"})
-    
-    let tActor = _.cloneDeep(actorToAdd);
-    tActor = {...tActor, ...extraParameters};
+function addActor(actorToAdd, extraParameters, extraEvents){
+    // Note : proper extraParam syntax : addActor("hero", {name : "bob"})
+    // extraParameteris is an object, extraEvents is an array of Object
+    let tPath = actorLib;
+    let tActor = _.cloneDeep(tPath[actorToAdd]);
+    let tExtraParameters = _.cloneDeep(extraParameters);
+    let tExtraEvents = _.cloneDeep(extraEvents);
+    // tActor.templateName = actorToAdd;
+    tActor = {...tActor, ...tExtraParameters};
+    if (extraEvents != null && extraEvents != undefined) tActor.eventStorage = [...tActor.eventStorage, ...tExtraEvents];
+    //tActor.eventStorage.push([...extraParameters.eventStorage]);
+    tActor.life.value = asD(tActor.life.value) || asD(tActor.life.base) || new Decimal(1)
     tActor.life.remain = asD(tActor.life.value) || asD(tActor.life.base) || new Decimal(1)
     player["mission"].actorList.push(tActor);
-    
+
 
 }
 
 function addEvent(targetActor, eventToAdd, extraParameters){
-    // Note : proper extraParam syntax : addActor(actorLib.hero, {name : "bob"})
+    // Note : proper extraParam syntax : addActor("hero", {name : "bob"})
     let tEvent = _.cloneDeep(eventToAdd);
+
     tEvent = {...tEvent,...extraParameters}
     
     targetActor.eventStorage.push(tEvent)
@@ -359,6 +411,8 @@ function doDamage(target, shotCount,shotDamage){
     // expected from target Object : life and quantity
     let shotLeft = asD(shotCount);
     let tShotDamage = asD(shotDamage).sub(target.armorBase).ceil(0)
+    let killCountToReturn = new Decimal(0);
+    let damageCountToReturn = new Decimal(0);
     
     function getShotToKill(value) {
         return asD(value).div(tShotDamage).ceil()
@@ -366,22 +420,28 @@ function doDamage(target, shotCount,shotDamage){
 
     if (asD(tShotDamage).gt(0) == 1) {
         while(
-            (asD(shotLeft).gt(new Decimal(0)) == 1)
+            (asD(shotLeft).gt(new Decimal(0)) == 1 && asD(target.quantity).gt(0) == 1)
             ){
             if (asD(target.life.value).cmp(target.life.remain) == true) {
                 let shotToKill = getShotToKill(target.life.value);
                 
                 if (shotToKill.lt(shotCount) == 1) { //can kill at least one from full health
                     let killCount = asD(shotLeft).div(shotToKill).floor();
+
+                    if (killCount.gt(target.quantity) == 1) killCount = asD(target.quantity)
+
                     let shotSpent = asD(killCount).mul(shotToKill);
                 
                     shotLeft = asD(shotLeft).sub(shotSpent);
                     target.quantity = asD(target.quantity).sub(killCount)
+                        killCountToReturn = killCountToReturn.add(killCount);
+                        damageCountToReturn = damageCountToReturn.add(killCount.mul(target.life.value))
                 } else {                            // do as much damage as possible
                     let damageCount = asD(shotLeft).mul(tShotDamage)
                     
                     shotLeft = new Decimal(0)
                     target.life.remain = asD(target.life.remain).sub(damageCount)
+                        damageCountToReturn = damageCountToReturn.add(damageCount)
                 }
             } else {
                 let shotToKill = getShotToKill(target.life.remain);
@@ -391,18 +451,24 @@ function doDamage(target, shotCount,shotDamage){
                 
                     shotLeft = asD(shotLeft).sub(shotSpent);
                     target.quantity = asD(target.quantity).sub(new Decimal(1))
+                        killCountToReturn = killCountToReturn.add(new Decimal(1))
+                        damageCountToReturn = damageCountToReturn.add(target.life.remain)
                     target.life.remain = new Decimal(target.life.value)
+                    
+
                 } else {                            // do as much damage as possible
                     let damageCount = asD(shotLeft).mul(tShotDamage)
                     
                     shotLeft = new Decimal(0)
                     target.life.remain = asD(target.life.remain).sub(damageCount)
+                        damageCountToReturn = damageCountToReturn.add(damageCount)
                 }
             }
 
             if (asD(target.life.remain).lte(new Decimal (0)) == 1) {
                 target.quantity = asD(target.quantity).sub(new Decimal(1));
                 target.life.remain = new Decimal(target.life.value);
+                        killCountToReturn = killCountToReturn.add(new Decimal(1))
             }
 
             if (asD(target.quantity).lte(new Decimal (0) == 1)) {
@@ -411,4 +477,6 @@ function doDamage(target, shotCount,shotDamage){
             }
         }
     }
+
+    return {shotCount : shotLeft, killCount : killCountToReturn, damageCount : damageCountToReturn }
 }
