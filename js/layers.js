@@ -76,8 +76,15 @@ function getGenericCoreValue(value, path, diff, specificActor, specificEvent, fl
 
                 if (tFlag.includes("splitinfour")) {
                     //console.log("picked nobase")
-                    eBase = (e[tValue]["base"] == null || e[tValue]["base"] == undefined) ? new Decimal(0) : asD(e[tValue]["base"]);
-                    eMult = (e[tValue]["mult"] == null || e[tValue]["mult"] == undefined) ? new Decimal(1) : asD(e[tValue]["mult"]);
+                    if (e[tValue] != null || e[tValue] != undefined) {
+                        eBase = (e[tValue]["base"] == null || e[tValue]["base"] == undefined) ? new Decimal(0) : asD(e[tValue]["base"]);
+                        eMult = (e[tValue]["mult"] == null || e[tValue]["mult"] == undefined) ? new Decimal(1) : asD(e[tValue]["mult"]);
+                    } else {
+                        eBase = new Decimal(0) ;
+                        eMult = new Decimal(1) ;
+
+                    }
+
                 } else {
                     neutralBase = tValue + "Base";
                     neutralMult = tValue + "Mult";
@@ -135,7 +142,8 @@ function canProgressPointGen(){
 }
 
 function getProgressPointGen(diff, specificActor) {
-    return getGenericCoreValue("progress" , player["mission"].actorList , diff , specificActor)
+    // OLD VERSION NOT IN FIVE OBJECT // return getGenericCoreValue("progress" , player["mission"].actorList , diff , specificActor)
+    return getGenericCoreValue( "progress" , player["mission"].actorList , diff , specificActor , undefined , ["splitinfour"])
 }
 
 function canThreatPointGen(){
@@ -196,9 +204,14 @@ function eventManager(){
 
     player["mission"].actorList.forEach(
         e => e.eventStorage.forEach (
-            f => {if (eventLib[f.name].eventCheck.call(e,f,f.lastCall) == true) {
-                f.lastCall = Date.now();
-                eventLib[f.name].eventEffect.call(e, f,f.lastCall)}
+            f => {
+                if (
+                    (eventLib[f.name].eventCheck != null || eventLib[f.name].eventCheck != undefined)
+                    && (eventLib[f.name].eventCheck.call(e,f,f.lastCall) == true)
+                    ) {
+                    f.lastCall = Date.now();
+                    eventLib[f.name].eventEffect.call(e, f,f.lastCall)
+                }
             }
         )
     )
@@ -215,15 +228,18 @@ function eventManager(){
 
 function stepNext(){
 
+    // TEMP INFINITE STEP
+    player["mission"].missionParameters.missionStepTarget = new Decimal("100");
+
     if (asD(player["mission"].missionStepCurrent).gte(player["mission"].missionParameters.missionStepTarget)) {
         player["mission"].missionComplete = true
         console.log("mission completed");
     } else {
 
-    let tProgressTarget  = new Decimal("1e6");
+    let tProgressTarget  = new Decimal("100");
     
-    tProgressTarget = tProgressTarget.add(asD(player["mission"].missionStepCurrent).times(10));
-    tProgressTarget = tProgressTarget.times(asD(player["mission"].missionParameters.missionRank));
+    // tProgressTarget = tProgressTarget.add(asD(player["mission"].missionStepCurrent).times(10));
+    // tProgressTarget = tProgressTarget.times(asD(player["mission"].missionParameters.missionRank));
     
     player["mission"].progressTarget = tProgressTarget;
     player["mission"].progress = new Decimal(0);
@@ -243,7 +259,7 @@ function populateActor() {
     addActor("hero", {level : player["hero"].points , eventStorage : [...player["mission"].missionEventLoadout]});
     }
 
-    for (let i = 0; player["mission"].missionStepCurrent.gt(i); i++) {
+    for (let i = 0; player["mission"].missionStepCurrent.gt(i); i+=5) {
         // console.log(`starting loop for i ${i.toString()}`)
         let rng = getRandomInt(1,3);
         // console.log(`Got RNG ${rng.toString()}`)
@@ -332,7 +348,9 @@ function addActor(actorToAdd, extraParameters, extraEvents){
 }
 
 function addEvent(targetActor, eventToAdd, extraParameters){
-    // Note : proper extraParam syntax : addActor("hero", {name : "bob"})
+    // Note : proper extraParam syntax :
+    // addEvent(this,{name : "selfdestruct", title : "No more action"})
+    // addEvent(actorLib[0],{name : "selfdestruct", title : "No more action"})
     let tEvent = _.cloneDeep(eventToAdd);
 
     tEvent = {...tEvent,...extraParameters}
@@ -340,14 +358,62 @@ function addEvent(targetActor, eventToAdd, extraParameters){
     targetActor.eventStorage.push(tEvent)
 }
 
+function addMod(targetEvent, modToAdd, extraParameters){
+    // addMod(this,{name : "damageModifier" , title : "Crit UP !" , eventChance : 50 , shotDamage : {mult : new Decimal(3)}})
+    // addMod(player["mission"].actorList[0].eventStorage[0],{name : "damageModifier" , title : "Crit UP !" , eventChance : 50 , shotDamage : {mult : new Decimal(3)}})
+    
+    let tMod = _.cloneDeep(modToAdd);
+
+    tMod = {...tMod,...extraParameters}
+    
+    if (targetEvent.modStorage == null || targetEvent.modStorage == undefined) targetEvent.modStorage = [];
+    targetEvent.modStorage.push(tMod)
+}
+
 //
 // Actor Filter functions //
 //
 
-function pickFromIndexList(targetNumber, indexList) {
-    let startingList= indexList;
+function pickFromIndexList(targetNumber, path, indexList, favoredTags) {
+    let startingList = indexList;
+    let favoriteList = [];
+    let remainList = []
     let pickTable = [];
     
+    startingList.forEach(
+        e => {
+            if(
+                (favoredTags != null && favoredTags != undefined)
+                && path[e].tags.some(f => f.includes(favoredTags)) 
+            ) {
+                favoriteList.push(e)
+            } else {
+                remainList.push(e)
+            }
+        }
+    )
+
+    if (favoriteList.length > 0) {
+        for (let x = 0 ; x < targetNumber ; x++) {
+            let pickedNumber = getRandomInt(0,favoriteList.length -1);
+            let pickedObject = (favoriteList[pickedNumber]);
+            favoriteList.splice(pickedNumber,1);
+            pickTable.push(pickedObject);
+        };
+    }
+
+    targetNumber = targetNumber - pickTable.length
+
+    if (targetNumber >0 && remainList.length > 0) {
+        for (let x = 0 ; x < targetNumber ; x++) {
+            let pickedNumber = getRandomInt(0,remainList.length -1);
+            let pickedObject = (remainList[pickedNumber]);
+            remainList.splice(pickedNumber,1);
+            pickTable.push(pickedObject);
+        };
+    }
+
+    /* OLD SYLE PICKING
     if (startingList.length > 0) {
         for (let x = 0 ; x < targetNumber ; x++) {
             let pickedNumber = getRandomInt(0,startingList.length -1);
@@ -356,6 +422,7 @@ function pickFromIndexList(targetNumber, indexList) {
             pickTable.push(pickedObject);
         };
     }
+    */
 
     return pickTable
 }

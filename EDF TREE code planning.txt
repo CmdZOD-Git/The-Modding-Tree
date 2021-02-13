@@ -1,36 +1,39 @@
 #3 - Cleaning-up before moving forward
 ##Catcing TODO and WIP
 
-* Format actor table
+* [OK] Format actor table
 	- need a little set of pre-formed string
 	- [LATER] could experiment w/ fillable clickables
 		* could do target list
 		* could do full info panel
 
-* Meta Actor
+* [LATER] Meta Actor
+	- Find a good use case
+	- Will come with mission design
+
+* [OK] Helper function for targetting could be useful
+	- [OK] Hard filter
+	- [OK] Preference sorting
+
+* [OK] Need a addMod function targeting an event
+
+* [LATER] I could also prototype a shoutbox
 	- Find a good use case
 
-* Helper function for targetting could be useful
-	- Hard filter
-	- Preference sorting
+* [OK] Need to relink threat ratio to progress
 
-* Need a addMod function targeting an event
-
-* I could also prototype a shoutbox
-	- Find a good use case
-
-* Need to relink threat ratio to progress
-
-* Clarify what is a local mult and a global mult
+* [THAT'S A RABIT HOLE I'M NOT READY FOR] Clarify what is a local mult and a global mult
+- Need a good use case
 
 * Cleanup pseudo FiveObject into proper Five Object
 
 ##Adding missing content
 Class Abilities
-* Fast advance (no enemy boost progress)
-* Resist (High Threat allow to progress w/ slower speed through X% of overthreat)
-* Building success (each succesful step increase stats (progress and threatCap))
-* Re-act (%chance to act twice)
+* [OK] Fast advance (no enemy boost progress)
+* [I DON'T WANT THIS GAMEPLAY WISE] Resist (High Threat allow to progress w/ slower speed through X% of overthreat)
+* [OK] Small fry stomper (Get Extra Threat Cap based on enemy Quantity)
+* [OK] Building success (each succesful step increase stats (progress and threatCap))
+* [WIP - BIGGER CHANGE] Re-act (%chance to act twice)
 
 Events
 * Spider net (slow down progress by a mult or a flat)
@@ -41,6 +44,9 @@ HQ upgrades
 * XP Generator
 * Spawn allies (tied to HQ level)
 * Auto-start random mission (toggle on mission to AUTO)
+
+Difficult implementation
+* Backpack (carrying extra weapon) that you can switch or that can autoswitch (but based on what ?)
 
 ##Roadmap
 TODO when upper ## are done

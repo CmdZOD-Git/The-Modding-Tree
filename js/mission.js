@@ -1,12 +1,74 @@
+function getInfoCard(actor){
+    let infoCard = ""
+    if (actor.side == "good") {
+        infoCard = `${showQuantity(actor)}<h3 style="color:${colorPerSide(actor.side)}">${actor.name}</h3> (L.${actor.level}) [${actor.tags.toString().toUpperCase()}]<br />
+        Threat Cap ${getThreatCap(actor,["perunit"]).toString()} <br />`
+
+        
+    } else if (actor.side =="bad") {
+        infoCard = `${showQuantity(actor)}<h3 style="color:${colorPerSide(actor.side)}">${actor.name}</h3> (L.${actor.level}) [${actor.tags.toString().toUpperCase()}]<br />
+        Threat ${formatWhole(getThreat(actor)).toString()} (${getThreat(actor,["perunit"]).toString()} /unit)<br />`
+    } else {
+        infoCard = `No Info`
+    }
+    
+    return infoCard
+
+}
+
 function getThreatRatio() {
-    let tRatio = asD(player["mission"].threat.value).div(player["mission"].threatCap.value)
-    tRatio = (tRatio.lt(1) == 1) ? new Decimal(1) : tRatio
-    return tRatio
+    if (asD(player["mission"].threat.value).gt(player["mission"].threatCap.value)) {
+        return new Decimal(0)
+    } else {
+        let tRatio = new Decimal (1)
+        return tRatio.sub(asD(player["mission"].threat.value).div(player["mission"].threatCap.value))
+    }
+}
+
+function showQuantity(actor) {
+    let tString = "";
+    if (asD(actor.quantity).gt(new Decimal(1))== 1) {
+        tString = actor.quantity.toString() + "x "
+    }
+    
+    return tString
+}
+
+function showLife (actor) {
+    tString = "";
+    
+    if (actor.life.remain != actor.life.value) {
+        tString = actor.life.remain.toString() + " (" + formatWhole(asD(actor.life.remain).times(new Decimal(100)).div(actor.life.value)) + "%)"
+    } else {
+        tString = actor.life.value.toString()
+    }
+
+    return tString
 }
 
 function colorPerSide(actorSide) {
     let tColor = "";
-    (actorSide == "good") ? tColor = "Blue" : tColor = "Red";
+
+    switch (actorSide) {
+        case "good" :
+            tColor = "Blue"
+        break;
+
+        case "bad" :
+            tColor = "Red"
+        break;
+
+        case "meta" :
+            tColor = "Yellow"
+        break;
+
+        default :
+            tColor = "grey"
+    }
+
+    
+        
+    
     return tColor
 }
 
@@ -61,6 +123,9 @@ addLayer("mission", {
                 ["display-text","main text here"],
                 ["infobox", "actorInfobox"],
                 ["blank","10px"],
+                ["display-text",
+                    function() { return `Step count ${player["mission"].missionStepCurrent.toString()}`}],
+                ["blank","5px"],
                 ["bar","progressBar"],
                 ["blank","10px"],
                 ["bar","threatBar"],
@@ -99,12 +164,16 @@ addLayer("mission", {
                 let tList = "";
                 
                 for (actor of player["mission"].actorList) {
-                    // tList = tList + actor.name.toString() + "<br />";
+                    tList = tList + getInfoCard(actor)
+
+                    /*
                     tList = tList + `<h3 style="color:${colorPerSide(actor.side)}">${actor.name}</h3> Lv ${actor.level} [${actor.tags.toString().toUpperCase()}]<br />
                     Qt : ${actor.quantity} HP : ${actor.life.remain} (${formatWhole(asD(actor.life.remain).times(new Decimal(100)).div(actor.life.value))}%)<br />
                     Threat : ${getThreat(actor,["perunit"]).toString()} per unit, total ${formatWhole(getThreat(actor)).toString()}<br /><br />
                     `
+                    */
                 }
+
                 return tList
             },
         },
@@ -123,7 +192,7 @@ addLayer("mission", {
             // **Optional**, Apply CSS to the unfilled portion, filled portion, border, and display text on the bar, in the form of an object where the keys are CSS attributes, and the values are the values for those attributes (both as strings).
             display() {
                 if (player["mission"].inMission == true) {
-                    return `${formatWhole(player["mission"].progress)} progress (${formatWhole(getProgressPointGen(new Decimal(1)))}/sec) out of ${formatWhole(player["mission"].progressTarget)}`
+                    return `${formatWhole(player["mission"].progress)} progress (${formatWhole(getProgressPointGen(new Decimal(1)).mul(getThreatRatio()))}/sec) out of ${formatWhole(player["mission"].progressTarget)}`
                 }
             },
 
@@ -136,7 +205,7 @@ addLayer("mission", {
 
         threatBar :{
             direction: RIGHT,
-            width: 400,
+            width: 500,
             height: 30,
 
             baseStyle: {'background-color' : 'Black'},
@@ -147,9 +216,9 @@ addLayer("mission", {
             display() {
                 if (player["mission"].inMission == true) {
                     if(asD(player["mission"].threat.value).gt(player["mission"].threatCap.value)==1){
-                        return `Overt Threat Cap by ${formatWhole(getThreatRatio().times(new Decimal(100)))} %`
+                        return `PROGRESS STOPPED - ${formatWhole(player["mission"].threat.value)} Threat (Cap ${formatWhole(player["mission"].threatCap.value)})`
                     } else {
-                        return `${formatWhole(player["mission"].threat.value)} threat, cap at ${formatWhole(player["mission"].threatCap.value)}`}
+                        return `PROGRESS SPEED x${formatWhole(getThreatRatio())} - ${formatWhole(player["mission"].threat.value)} Threat (Cap ${formatWhole(player["mission"].threatCap.value)})`}
                     }
             },
 
@@ -166,6 +235,8 @@ addLayer("mission", {
             tDiff *= player.extraSpeed
             player.extraTime -= tDiff
             if (player.extraTime < 0) player.extraTime = 0
+        } else if (player.extraSpeed > 1) {
+            player.extraSpeed = 1
         }
         //Forcing Lock / Unlock & Tooltip
         if (player["mission"].inMission) {
@@ -183,8 +254,8 @@ addLayer("mission", {
                 stepNext();
         // Regular loop
         } else if (player["mission"].inMission == true){
-            //TEMP // player["mission"].progress = asD(player["mission"].progress).add(getProgressPointGen(tDiff).div(getThreatRatio()));
-            player["mission"].progress = asD(player["mission"].progress).add(getProgressPointGen(tDiff));
+            player["mission"].progress = asD(player["mission"].progress).add(getProgressPointGen(tDiff).mul(getThreatRatio()));
+            // Fporumula if Threat Ratio ignored //player["mission"].progress = asD(player["mission"].progress).add(getProgressPointGen(tDiff));
 
             player["mission"].threat.value =  getThreat();
             player["mission"].threatCap.value =  getThreatCap();

@@ -88,7 +88,7 @@ addLayer("hq", {
                     player["mission"].missionParameters = player["hq"].plannedMission.missionParameters;
                     player["mission"].missionEventLoadout = getEventLoadout();
                     
-                    console.log(player["mission"].missionParameters);
+                    // console.log(player["mission"].missionParameters);
 
                     player["mission"].inMission = true
                 } else {
@@ -173,7 +173,7 @@ addLayer("hq", {
             onClick(){
                 player["hq"].plannedMission = Object.assign(this)
                 // plannedMission = tmp[this.layer].clickables[this.id]
-                console.log(player["hq"].plannedMission)
+                // console.log(player["hq"].plannedMission)
             },
         },
     },

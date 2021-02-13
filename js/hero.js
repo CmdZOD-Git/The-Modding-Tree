@@ -65,16 +65,27 @@ function getEventLoadout(){
     let tPath = player["hero"].upgrades
     
     for (e of tPath) {
-        for (f of tmp["hero"].upgrades[e].modToAdd) {
-            for (g of tResultArray) {
-                if (g.tags != null || g.tags != undefined) {
-                    if(g.tags.includes(...f.addToTags) || f.addToTags.includes("all")) {
-                        g.modStorage.push(_.cloneDeep(f))
+        if (tmp["hero"].upgrades[e].modToAdd != null && tmp["hero"].upgrades[e].modToAdd != undefined) {
+            for (f of tmp["hero"].upgrades[e].modToAdd) {
+                for (g of tResultArray) {
+                    if (g.tags != null || g.tags != undefined) {
+                        if(g.tags.includes(...f.addToTags) || f.addToTags.includes("all")) {
+                            g.modStorage.push(_.cloneDeep(f))
+                        }
                     }
                 }
             }
         }
-    }    
+    }
+
+    for (e of tPath) {
+        if (tmp["hero"].upgrades[e].event != null && tmp["hero"].upgrades[e].event != undefined) {
+            for (f of tmp["hero"].upgrades[e].event) {
+                tResultArray.push(_.cloneDeep(f))
+            }
+        }
+    }
+
 
     return tResultArray;
 }
@@ -191,9 +202,9 @@ addLayer("hero", {
 
     upgrades : {
         rows: 5,
-        cols: 3,
+        cols: 5,
         11: {
-            title: "MOD", //**optional**. Displayed at the top in a larger font. It can also be a function that returns updating text. Can use basic HTML.
+            title: "Rifle Crit", //**optional**. Displayed at the top in a larger font. It can also be a function that returns updating text. Can use basic HTML.
             description: "Crit Mod Test", //A description of the upgrade's effect. *You will also have to implement the effect where it is applied.* It can also be a function that returns updating text. Can use basic HTML.
 
             equipTab : "Class", //Capitalized to match tabs name
@@ -210,23 +221,86 @@ addLayer("hero", {
                     eventChance : 50,
                     shotDamage : {mult : new Decimal(3)},                    
             }],            
-            
-            // effect(): **optional**. A function that calculates and returns the current values of any bonuses from the upgrade. Can return a value or an object containing multiple values.
-            // effectDisplay(): **optional**. A function that returns a display of the current effects of the upgrade with formatting. Default displays nothing. Can use basic HTML.            
-            // fullDisplay(): **OVERRIDE**. Overrides the other displays and descriptions, and lets you set the full text for the upgrade. Can use basic HTML.
-            // onPurchase(): **optional**. This function will be called when the upgrade is purchased. Good for upgrades like "makes this layer act like it was unlocked first".
-            // style: **optional**. Applies CSS to this upgrade, in the form of an object where the keys are CSS attributes, and the values are the values for those attributes (both as strings).
-            /*
-            By default, upgrades use the main prestige currency for the layer. You can include these to change them (but it needs to be a Decimal):
-            - currencyDisplayName: **optional**. The name to display for the currency for the upgrade.
-            - currencyInternalName: **optional**. The internal name for that currency.
-            - currencyLayer: **optional**. The internal name of the layer that currency is stored in. If it's not in a layer (like Points), omit. If it's not stored directly in a layer, instead use the next feature.
-            - currencyLocation: **optional**. If your currency is stored in something inside a layer (e.g. a buyable's amount), you can access it this way. This is a function returning the object in "player" that contains the value (like `player[this.layer].buyables`)
+        },
 
-            If you want to do something more complicated like upgrades that cost two currencies, you can override the purchase system with these (and you need to use fullDisplay as well)
-            - canAfford(): **OVERRIDE**, a function determining if you are able to buy the upgrade
-            - pay(): **OVERRIDE**, a function that reduces your currencies when you buy the upgrade
-            */
+        12: {
+            title: "Fast Advance", //**optional**. Displayed at the top in a larger font. It can also be a function that returns updating text. Can use basic HTML.
+            description: "progress fast with no enemy", //A description of the upgrade's effect. *You will also have to implement the effect where it is applied.* It can also be a function that returns updating text. Can use basic HTML.
+
+            equipTab : "Class", //Capitalized to match tabs name
+            unlocked(){if(player.subtabs["hero"].mainTabs == this.equipTab) return true}, // unlocked(): **optional**. A function returning a bool to determine if the upgrade is visible or not. Default is unlocked.
+
+            cost: new Decimal(1), // A Decimal for the cost of the upgrade. By default, upgrades cost the main prestige currency for the layer.
+            currencyDisplayName: "RP",
+            currencyInternalName: "points",
+
+            event : [{
+                name : "progressUp",
+                title : "Fast Advance",
+
+                tags : ["nothreat"],
+
+                cooldown : new Decimal(1000), // in millisecond
+
+                power : new Decimal (50),
+            },],
+        },
+
+        13: {
+            title: "Small Fry Stomper", //**optional**. Displayed at the top in a larger font. It can also be a function that returns updating text. Can use basic HTML.
+            description: "Enemy quantity increases threat cap", //A description of the upgrade's effect. *You will also have to implement the effect where it is applied.* It can also be a function that returns updating text. Can use basic HTML.
+
+            equipTab : "Class", //Capitalized to match tabs name
+            unlocked(){if(player.subtabs["hero"].mainTabs == this.equipTab) return true}, // unlocked(): **optional**. A function returning a bool to determine if the upgrade is visible or not. Default is unlocked.
+
+            cost: new Decimal(1), // A Decimal for the cost of the upgrade. By default, upgrades cost the main prestige currency for the layer.
+            currencyDisplayName: "RP",
+            currencyInternalName: "points",
+
+            event : [{
+                name : "threatCapUp",
+                title : "CAP per Qt",
+
+                tags : ["perenemyquantity"],
+
+                cooldown : new Decimal(1000), // in millisecond
+
+                power : new Decimal (1),
+            },],
+        },
+
+        14: {
+            title: "Building Success", //**optional**. Displayed at the top in a larger font. It can also be a function that returns updating text. Can use basic HTML.
+            description: "Better progress and threat cap per step", //A description of the upgrade's effect. *You will also have to implement the effect where it is applied.* It can also be a function that returns updating text. Can use basic HTML.
+
+            equipTab : "Class", //Capitalized to match tabs name
+            unlocked(){if(player.subtabs["hero"].mainTabs == this.equipTab) return true}, // unlocked(): **optional**. A function returning a bool to determine if the upgrade is visible or not. Default is unlocked.
+
+            cost: new Decimal(1), // A Decimal for the cost of the upgrade. By default, upgrades cost the main prestige currency for the layer.
+            currencyDisplayName: "RP",
+            currencyInternalName: "points",
+
+            event : [{
+                name : "threatCapUp",
+                title : "Per Step",
+
+                tags : ["perstep"],
+
+                cooldown : new Decimal(1000), // in millisecond
+
+                power : new Decimal (10),
+            },
+
+            {
+                name : "progressUp",
+                title : "Per Step",
+
+                tags : ["perstep"],
+
+                cooldown : new Decimal(1000), // in millisecond
+
+                power : new Decimal (1),
+            },],
         },
     },
 
@@ -349,6 +423,9 @@ addLayer("hero", {
             event : [{
                 name : "weapon",
                 title : "Rocket",
+
+                favoredtargetTags : ["structure"],
+
                 cooldown : new Decimal(1000), // in millisecond
                 shotCount : new Decimal(1),
                 shotDamage : new Decimal(100),
@@ -391,7 +468,7 @@ addLayer("hero", {
                 tags : ["thresholdbased"],
             }],
         },
-        */
+        
 
         62: {
             title:"Recover kit",
@@ -425,9 +502,10 @@ addLayer("hero", {
                 cooldown : new Decimal(1000), // in millisecond
                 recoverAmount : new Decimal(20),
                 //recoverRatioThreshold : new Decimal(0),
-                tags : ["noenemyleft"]
+                tags : ["noenemyleft"],
             }],
         },
+        */
 
         63: {
             title:"Grenade",
@@ -458,7 +536,7 @@ addLayer("hero", {
                 name : "weapon",
                 title : "Grenade",
                 cooldown : new Decimal(1000), // in millisecond
-                eventChance : 10, // flat int percent chance to fire
+                eventChance : 10, // flat in percent chance to fire
                 shotCount : new Decimal(10),
                 shotDamage : new Decimal(10),
             }],
@@ -490,8 +568,9 @@ addLayer("hero", {
             },
 
             event : [{
-                name : "armor",
+                name : "threatCapUp",
                 title : "Armor up",
+                tags : ["accumulate"],
                 cooldown : new Decimal(1000), // in millisecond
             }],
         },

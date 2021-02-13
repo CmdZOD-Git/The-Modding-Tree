@@ -1,11 +1,14 @@
 function FiveObject(baseValue, multValue,flatValue){
-    this.base = new Decimal(baseValue);
+    this.base = new Decimal(baseValue || 0) ;
     this.mult = new Decimal(multValue || 1);
     this.flat = new Decimal(flatValue || 0);
+
     this.value = new Decimal(this.base.mul(this.mult).add(this.flat));
     this.remain = new Decimal(this.value);
-    console.log(`${this.toString()} ${this.base.toString()} ${this.mult.toString()} ${this.flat.toString()} ${this.value.toString()} ${this.remain.toString()}`)
+    // console.log(`${this.toString()} ${this.base.toString()} ${this.mult.toString()} ${this.flat.toString()} ${this.value.toString()} ${this.remain.toString()}`)
 }
+
+
 
 let actorLib = {
     hero : {
@@ -19,8 +22,7 @@ let actorLib = {
         threat : new FiveObject(0),
         threatCap : new FiveObject(10),
         
-        progressBase : new Decimal(5),
-        progressMult : new Decimal(1),
+        progress : new FiveObject(5,1),
 
         nextStepBehaviour : "keep",
     },
@@ -31,7 +33,7 @@ let actorLib = {
         quantity : new Decimal(1),
         level : new Decimal(1),
         life : {base : new Decimal(100),value : new Decimal(100)},
-        armorBase : new Decimal(10),
+        armorBase : new Decimal(1),
         tags : ["structure"],
         
         threat : new FiveObject(0),
@@ -163,7 +165,42 @@ let actorLib = {
 }
 
 let eventLib = {
-    armor : {
+
+    progressUp : {
+        title : "Progress UP",
+        eventSide : "good",
+        nextStepBehaviour : "reset",
+        eventCheck(callingEvent, lastCallTime) {
+            return true
+        },
+        
+        eventEffect(callingEvent, lastCallTime){
+            if (callingEvent.progress == null || callingEvent.progress == undefined) callingEvent.progress = new FiveObject
+            if (callingEvent.counter == null || callingEvent.progress == undefined) callingEvent.counter = new Decimal(0)
+
+            if(callingEvent.tags.includes("nothreat")) {
+                if (asD(player["mission"].threat.value).lte(new Decimal(0)) == 1) {
+                    callingEvent.counter =  new Decimal(1)
+                    console.log(callingEvent.counter.toString())
+                }  else {
+                    callingEvent.counter = new Decimal(0);                
+                    console.log(callingEvent.counter.toString())
+                }
+
+                callingEvent.progress.base = asD(callingEvent.counter).mul(callingEvent.power || new Decimal(10))
+
+            } else if (callingEvent.tags.includes("perstep")) {
+                let tSum = asD(player["mission"].missionStepCurrent).sub(new Decimal(1));
+                
+                callingEvent.progress.base = asD(tSum).mul(new Decimal(callingEvent.power || 1))
+            }
+
+
+            
+        },
+    },
+
+    threatCapUp : {
         title : "Armor up",
         eventSide : "good",
         nextStepBehaviour : "keep",
@@ -178,11 +215,35 @@ let eventLib = {
         },
         
         eventEffect(callingEvent, lastCallTime){
+            if (callingEvent.treatCap == null || callingEvent.treatCap == undefined) callingEvent.threatCap = new FiveObject
+            
+            if(callingEvent.tags.includes("accumulate")) {
             (callingEvent.counter == null || callingEvent.counter == undefined)
                 ? callingEvent.counter = new Decimal(0)
                 : callingEvent.counter = asD(callingEvent.counter).add(new Decimal(1));
-            
-            callingEvent.threatCap.base = asD(callingEvent.counter).mul(new Decimal(5))
+                
+                callingEvent.threatCap.base = asD(callingEvent.counter).mul(new Decimal(callingEvent.power || 5))
+            } else if(callingEvent.tags.includes("perenemyquantity")) {
+                let tSum = new Decimal(0);
+                
+                player["mission"].actorList.forEach(                    
+                    e => {
+                        if (
+                            (e.quantity != null || e.quantity != undefined)
+                            && (e.side == "bad")
+                            ) {
+                                tSum = tSum.add(e.quantity)
+                            } 
+                    }
+                )
+                
+                callingEvent.threatCap.base = asD(tSum).mul(new Decimal(callingEvent.power || 1))
+
+            } else if (callingEvent.tags.includes("perstep")) {
+                let tSum = asD(player["mission"].missionStepCurrent).sub(new Decimal(1));
+                
+                callingEvent.threatCap.base = asD(tSum).mul(new Decimal(callingEvent.power || 1))
+            }
         },
     },
 
@@ -351,8 +412,8 @@ let eventLib = {
             
             // Crit and modifier logic
             let tShotParameter = {
-                shotDamage :{value : new Decimal(0), base : new Decimal(0), mult : new Decimal(1), flat : new Decimal(0)},
-                shotCount : {value : new Decimal(0), base : new Decimal(0), mult : new Decimal(1), flat : new Decimal(0)},
+                shotDamage : new FiveObject(),
+                shotCount : new FiveObject(),
             };
             tShotParameter.shotDamage.base = _.cloneDeep(callingEvent.shotDamage)
             tShotParameter.shotCount.base = _.cloneDeep(callingEvent.shotCount)
@@ -363,7 +424,7 @@ let eventLib = {
             //
 
             let potentialTargetIndexList = getActorIndexListByFilter(tPath,{side : otherSide(this.side)}); // return an index of array 
-            let targetIndexList = pickFromIndexList(1,potentialTargetIndexList); // return an index of array
+            let targetIndexList = pickFromIndexList(1, tPath, potentialTargetIndexList, callingEvent.favoredtargetTags); // return an index of array
             if (targetIndexList.length > 0) {
                 for (let target of targetIndexList) { // call on each index of array
                     console.log(`${this.name} fired at ${tPath[target]?.name} with ${callingEvent.title}`);
@@ -417,7 +478,7 @@ function weaponModIterator(callingEvent, shotParameter , lastCallTime) {
                 }
             }
         )
-
-        return shotParameter
     }
+
+    return shotParameter
 }

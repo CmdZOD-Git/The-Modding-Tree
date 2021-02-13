@@ -7,3 +7,5 @@ addActor(actorLib.antswarm, {quantity : new Decimal(getRandomInt(1000000,1000000
 player = JSON.parse(JSON.stringify(player))
 getThreatCap(player.mission.actorList[0])
 addActor(actorLib.antregenerator);
+addMod(player["mission"].actorList[0].eventStorage[0],{name : "damageModifier" , title : "Crit UP !" , eventChance : 50 , shotDamage : {mult : new Decimal(3)}})
+addMod(player["mission"].actorList[0].eventStorage[0],{name : "damageModifier" , title : "Crit UP !" , eventChance : 100 , shotCount : {mult : new Decimal(3)}})
